@@ -1,22 +1,17 @@
-// Initialize tab count
 let tabCount = 0;
 
-// Load existing tabs from localStorage when the document is fully loaded
 window.addEventListener("DOMContentLoaded", () => {
     const tabContainer = document.getElementById("tab-container");
     const tabs = document.getElementById("tabs");
 
-    // Retrieve the number of saved tabs from localStorage
     const savedTabCount = parseInt(localStorage.getItem("tab-count")) || 0;
     tabCount = savedTabCount;
 
-    // Iterate through the saved tabs and recreate them
     for (let i = 1; i <= tabCount; i++) {
         const tabId = `Tab${i}`;
         const tabName = localStorage.getItem(`${tabId}-name`);
         const tabContent = localStorage.getItem(tabId);
 
-        // Only recreate tabs that have both a name and content
         if (tabName !== null && tabContent !== null) {
             const tabBtn = createTabButton(tabId, tabName);
             tabs.insertBefore(tabBtn, document.getElementById("add-tab-button"));
@@ -31,7 +26,6 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Activate the first tab if any exist
     const firstTab = document.querySelector(".tab-button");
     const firstContent = document.querySelector(".tab-content");
     if (firstTab && firstContent) {
@@ -40,7 +34,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Function to create a new tab button
 function createTabButton(tabId, tabName = tabId) {
     const tabBtn = document.createElement("button");
     tabBtn.className = "tab-button";
@@ -74,7 +67,6 @@ function createTabButton(tabId, tabName = tabId) {
     return tabBtn;
 }
 
-// Function to switch between tabs
 function openTab(evt, tabName) {
     document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
     document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
@@ -83,19 +75,16 @@ function openTab(evt, tabName) {
     evt.currentTarget.classList.add("active");
 }
 
-// Function to save the content of a tab
 function saveTabContent(id) {
     const content = document.getElementById(id).innerHTML; // Save formatted content
     localStorage.setItem(id, content);
 }
 
-// Function to rename a tab
 function renameTab(spanEl, id) {
     const name = spanEl.innerText.trim();
     localStorage.setItem(`${id}-name`, name);
 }
 
-// Function to create a new tab
 function createTab() {
     tabCount++;
     localStorage.setItem("tab-count", tabCount);
@@ -119,27 +108,46 @@ function createTab() {
     newButton.click();
 }
 
-// Function to delete a tab
-function deleteTab(id, button) {
-    const tab = document.getElementById(id);
-    const wasActive = tab.classList.contains("active");
+function createTabButton(tabId, tabName = tabId) {
+    const tabBtn = document.createElement("button");
+    tabBtn.className = "tab-button";
 
-    tab.remove();
-    button.remove();
+    const span = document.createElement("span");
+    span.contentEditable = true;
+    span.innerText = tabName;
+    span.oninput = () => renameTab(span, tabId);
 
-    localStorage.removeItem(id);
-    localStorage.removeItem(`${id}-name`);
+    const del = document.createElement("span");
+    del.className = "delete-tab";
+    del.innerText = "✕";
 
-    const remainingTabs = document.querySelectorAll(".tab-button").length;
-    localStorage.setItem("tab-count", remainingTabs);
-    tabCount = remainingTabs;
+    let holdTimeout;
 
-    if (wasActive) {
-        const firstTab = document.querySelector(".tab-button");
-        const firstContent = document.querySelector(".tab-content");
-        if (firstTab && firstContent) {
-            firstTab.classList.add("active");
-            firstContent.classList.add("active");
-        }
-    }
+    const initiateDelete = () => {
+        del.classList.add("danger");
+        holdTimeout = setTimeout(() => deleteTab(tabId, tabBtn), 1000);
+    };
+
+    const cancelDelete = () => {
+        clearTimeout(holdTimeout);
+        del.classList.remove("danger");
+    };
+
+    del.onmousedown = initiateDelete;
+    del.onmouseup = del.onmouseleave = cancelDelete;
+
+    del.ontouchstart = (e) => {
+        e.preventDefault(); // Prevents text selection or scrolling
+        initiateDelete();
+    };
+    del.ontouchend = del.ontouchcancel = cancelDelete;
+
+    tabBtn.appendChild(span);
+    tabBtn.appendChild(del);
+    tabBtn.onclick = (e) => {
+        if (e.target === del) return;
+        openTab(e, tabId);
+    };
+
+    return tabBtn;
 }
