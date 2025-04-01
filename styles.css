@@ -1,0 +1,103 @@
+:root {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --tab-bg: #1f1f1f;
+    --tab-active-bg: #333333;
+    --tab-hover: #2a2a2a;
+    --border-color: #333;
+    --accent: #acacac00;
+  }
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  .tabs {
+    display: flex;
+    background-color: var(--tab-bg);
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+  }
+  
+  .tab-button {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-color);
+    transition: background-color 0.2s;
+  }
+  
+  .tab-button span {
+    outline: none;
+  }
+  
+  .tab-button:hover {
+    background-color: var(--tab-hover);
+  }
+  
+  .tab-button.active {
+    background-color: var(--tab-active-bg);
+  }
+  
+  #add-tab-button {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 8px 16px;
+    margin-left: auto;
+    margin-right: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: var(--accent);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  #add-tab-button:hover {
+    background-color: #5f5f5f;
+  }
+  
+  .tab-content {
+    display: none;
+    height: calc(100vh - 41px);
+    padding: 20px;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 1.6;
+    outline: none;
+    overflow-y: auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+
+  .delete-tab.danger {
+    color: red;
+    animation: pulse 1s infinite;
+  }
+  .delete-tab {
+    font-size: 14px;
+    color: gray;
+    cursor: pointer;
+    padding-left: 6px;
+    user-select: none;
+    transition: color 0.2s;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
